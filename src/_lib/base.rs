@@ -1,5 +1,5 @@
 use std::io;
-use std::io::Write;
+use std::io::{Read, Write};
 
 /// ## 接受用户输入内容
 /// 返回输入内容
@@ -11,11 +11,11 @@ use std::io::Write;
 /// assert_eq!(input, "hello");
 /// ```
 pub(crate) fn input(tip: &str, res: &mut String) {
-    print!("{}", tip);
-    io::stdout().flush().expect("Err: 刷新失败");
-    io::stdin()
-        .read_line(res)
-        .expect("Err: 读取输入失败");
+	print!("{}", tip);
+	io::stdout().flush().expect("Err: Refresh failed");
+	io::stdin()
+		.read_line(res)
+		.expect("Err: Read input failed");
 }
 
 /// ## 接受用户确认
@@ -28,14 +28,27 @@ pub(crate) fn input(tip: &str, res: &mut String) {
 /// assert_eq!(res, true);
 /// ```
 pub(crate) fn identify(tip: &str, res: &mut bool) {
-    let mut _input = String::new();
-    input(tip, &mut _input);
-    *res = _input.trim() == "y";
+	let mut _input = String::new();
+	input(tip, &mut _input);
+	*res = _input.trim() == "y";
 }
 
-/// ## 按任意键继续
-pub(crate) fn please() {
-    print!("按任意键继续...");
-    io::stdout().flush().expect("Err: 刷新失败");
-    io::stdin().read_line(&mut String::new()).expect("Err: 读取输入失败");
+/// ## 接受用户输入字符
+fn getchar() -> char {
+	let mut buf = vec![0; 1];
+	io::stdin().lock().read_exact(&mut buf).unwrap();
+	buf[0] as _
+}
+
+/// ## 系统提示
+/// 1. `please` 等待用户回车
+pub(crate) fn system(token: &str) {
+	match token {
+		"please" => {
+			print!("Enter to continue...");
+			io::stdout().flush().expect("Err: Refresh failed");
+			getchar();
+		}
+		_ => {}
+	}
 }

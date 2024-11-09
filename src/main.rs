@@ -1,8 +1,7 @@
 mod _lib;
 
 use std::collections::LinkedList;
-use clap::{Arg, Command, Parser};
-use clap::builder::TypedValueParser;
+use clap::{Arg, ArgMatches, Command};
 use colored::*;
 use crate::_lib::base;
 
@@ -19,30 +18,26 @@ fn main() {
 	#[cfg(windows)]
 	enable_ansi_support();
 
-	let mut args = get_args();
-	let mut iter = args.iter();
-	println!("{} || {} .", iter.next().unwrap(), iter.next().unwrap());
+	let mut args = get_args().into_iter();
 
-	// println!("请确认一下信息：\n项目路径: {}\n输出路径: {}\nSDK版本: {}", args[0].green().underline(), args[1].green().underline(), args[2].green().underline());
-	// let mut keep = false;
-	// base::identify("是否继续？(y/n): ", &mut keep);
-	// if keep {
-	//     println!("开始编译...");
-	// } else {
-	//     print!("已取消编译。");
-	//     exit(0);
-	// }
+	while let Some(arg) = args.next() {
+		println!("arg: {}", arg);
+	}
+	exit(0)
 }
 
 /// ## 退出程序
 /// 提示用户按任意键继续
 fn exit(exit_code: i32) {
-	base::please();
+	base::system("please");
 	std::process::exit(exit_code);
 }
 
 /// ## 获取命令行参数
 /// 读入操作和必要参数
+/// 0. 路径
+/// 1. 操作
+/// 2. 参数...
 fn get_args() -> LinkedList<String> {
 	let mut res: LinkedList<String> = LinkedList::new();
 	let matches = Command::new(NAME)
@@ -71,7 +66,7 @@ fn get_args() -> LinkedList<String> {
 					.help("Specify the version of the project")
 					.default_value("0.1.0")))
 		.subcommand(Command::new("remove")
-		.about("Remove 青鸾 items from the directory"))
+			.about("Remove 青鸾 items from the directory"))
 		.subcommand(Command::new("install")
 			.about("Install dependencies")
 			.arg(
@@ -85,9 +80,24 @@ fn get_args() -> LinkedList<String> {
 					.help("Specify the version of the package to be installed")
 					.required(false)))
 		.subcommand(Command::new("uninstall")
-			.about("Uninstall dependencies"))
+			.about("Uninstall dependencies")
+			.arg(
+				Arg::new("packageName")
+					.value_name("PACKAGE NAME")
+					.help("Specify the name of the package to be uninstall")
+					.required(true)))
 		.subcommand(Command::new("update")
-			.about("Update the dependencies of the Qingluan project in the directory"))
+			.about("Update the dependencies of the 青鸾 project in the directory")
+			.arg(
+				Arg::new("packageName")
+					.value_name("PACKAGE NAME")
+					.help("Specify the name of the package to be updated")
+					.required(false))
+			.arg(
+				Arg::new("version")
+					.value_name("VERSION")
+					.help("Specify the version to which you want to update the package")
+					.required(false)))
 		.arg(Arg::new("path")
 			.short('p')
 			.long("path")
@@ -96,17 +106,37 @@ fn get_args() -> LinkedList<String> {
 			.default_value("."))
 		.get_matches();
 
-	// if let Some((command)) = matches.subcommand() {
-	//     res.push_back(command.to_string());
-	// }
-	//
-	// // 获取路径
-	// let mut path = matches.get_one::<String>("path").unwrap().to_string();
-	// path = if path.eq("The current directory") {
-	//     std::env::current_dir().unwrap().to_str().unwrap().to_string()
-	// } else {
-	//     path.to_string()
-	// };
-	// res.push_back(path.to_string());
-	return res;
+	// 获取路径
+	let mut path = matches.get_one::<String>("path").unwrap().to_string();
+	path = match path.eq(".") {
+		true => std::env::current_dir().unwrap().to_str().unwrap().to_string().replace("\\", "/"),
+		_ => path.replace("\\", "/"),
+	};
+	res.push_back(path.to_string());
+
+	// 获取子命令
+	if let Some((command, sub_matches)) = matches.subcommand() {
+		// 将子命令的名称存入列表
+		res.push_back(command.to_string());
+
+		// 根据不同的子命令添加相应的参数
+		fn append_cmd(sub_matches: &ArgMatches, res: &mut LinkedList<String>, token: &[&str]) {
+			let mut iter = token.iter();
+			while let Some(arg) = iter.next() {
+				if let Some(v) = sub_matches.get_one::<String>(arg) {
+					res.push_back(v.to_string());
+				}
+			}
+		}
+
+		match command {
+			"init" => append_cmd(sub_matches, &mut res, &["packageName", "edition", "version"]),
+			"remove" => {}
+			"install" => append_cmd(sub_matches, &mut res, &["packageName", "version"]),
+			"uninstall" => append_cmd(sub_matches, &mut res, &["packageName"]),
+			"update" => append_cmd(sub_matches, &mut res, &["packageName", "version"]),
+			_ => {}
+		}
+	}
+	res
 }
