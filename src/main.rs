@@ -20,9 +20,12 @@ fn main() {
 
 	let mut args = get_args().into_iter();
 
+	println!("path:   {}", args.next().unwrap());
+	println!("action: {}", args.next().unwrap());
 	while let Some(arg) = args.next() {
-		println!("arg: {}", arg);
+		println!("arg:    {}", arg);
 	}
+
 	exit(0)
 }
 
@@ -57,14 +60,7 @@ fn get_args() -> LinkedList<String> {
 					.long("edition")
 					.value_name("VERSION")
 					.help("Specify the build criteria")
-					.default_value(VERSION))
-			.arg(
-				Arg::new("version")
-					.short('v')
-					.long("version")
-					.value_name("VERSION")
-					.help("Specify the version of the project")
-					.default_value("0.1.0")))
+					.default_value(VERSION)))
 		.subcommand(Command::new("remove")
 			.about("Remove 青鸾 items from the directory"))
 		.subcommand(Command::new("install")
@@ -78,6 +74,7 @@ fn get_args() -> LinkedList<String> {
 				Arg::new("version")
 					.value_name("VERSION")
 					.help("Specify the version of the package to be installed")
+					.default_value("Latest")
 					.required(false)))
 		.subcommand(Command::new("uninstall")
 			.about("Uninstall dependencies")
@@ -97,6 +94,7 @@ fn get_args() -> LinkedList<String> {
 				Arg::new("version")
 					.value_name("VERSION")
 					.help("Specify the version to which you want to update the package")
+					.default_value("Latest")
 					.required(false)))
 		.arg(Arg::new("path")
 			.short('p')
