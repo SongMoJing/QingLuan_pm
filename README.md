@@ -1,16 +1,10 @@
-# 青鸾SDK
-
-
-> 青鸾语言
-
-
 ## 包管理器 [pm]
 
 ### 参数
 
 `pm <Options> <Command>`
 
-####  -p
+#### -p
 
 > 对象路径
 
@@ -22,11 +16,11 @@
 
 `pm ... init <Project Name> -e <Version>`
 
- | `<Project Name>` : 项目名称
+| `<Project Name>` : 项目名称
 
- | `-e <Version[def: 包管理器版本]>` : 框架版本（编译）
+| `-e <Version[def: 包管理器版本]>` : 框架版本（编译）
 
-####  remove
+#### remove
 
 > 移除项目
 
@@ -38,17 +32,17 @@
 
 `pm ... install <Package Name> <Version>`
 
- | `<Package Name>` : 包名称
+| `<Package Name>` : 包名称
 
- | `* <Version[def: Latest]>` : 指定包版本，默认最新
+| `* <Version[def: Latest]>` : 指定包版本，默认最新
 
-####  uninstall
+#### uninstall
 
 > 卸载包
 
 `pm ... uninstall <Package Name>`
 
- | `Package Name>` : 包名称
+| `Package Name>` : 包名称
 
 #### update
 
@@ -56,16 +50,6 @@
 
 `pm ... update <Package Name> <Version>`
 
- | `<Package Name>` : 包名称
+| `<Package Name>` : 包名称
 
- | `* <Version[def: Latest]>` : 指定包版本，默认最新
-
-### 注释
-
-#### 版本
-
-> "*" 
-
-## 编译器 [cpl]
-
-// TODO
+| `* <Version[def: Latest]>` : 指定包版本，默认最新

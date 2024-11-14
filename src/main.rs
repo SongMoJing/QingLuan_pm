@@ -96,6 +96,13 @@ fn get_args() -> LinkedList<String> {
 					.help("Specify the version to which you want to update the package")
 					.default_value("Latest")
 					.required(false)))
+		.subcommand(Command::new("packaged")
+			.about("Package the 青鸾 project")
+			.arg(
+				Arg::new("packageName")
+					.value_name("PACKAGE NAME")
+					.help("Specify the package name")
+					.required(true)))
 		.arg(Arg::new("path")
 			.short('p')
 			.long("path")
@@ -133,6 +140,7 @@ fn get_args() -> LinkedList<String> {
 			"install" => append_cmd(sub_matches, &mut res, &["packageName", "version"]),
 			"uninstall" => append_cmd(sub_matches, &mut res, &["packageName"]),
 			"update" => append_cmd(sub_matches, &mut res, &["packageName", "version"]),
+			"packaged" => append_cmd(sub_matches, &mut res, &["packageName"]),
 			_ => {}
 		}
 	}
